@@ -1,0 +1,336 @@
+﻿@page
+@model Restaurant_Manager.Pages.Perfil.IndexModel
+@{
+    string nombre = HttpContext.Session.GetString("Nombre");
+    string email = HttpContext.Session.GetString("Email");
+    string imagen = HttpContext.Session.GetString("Imagen");
+    string telefono = HttpContext.Session.GetString("Telefono");
+}
+
+<div class="container py-5">
+    <!-- Encabezado -->
+    <header class="d-flex align-items-center gap-3 mb-4">
+        <div class="position-relative overflow-hidden rounded-circle" style="height: 64px; width: 64px;">
+            <img class="img-fluid" alt="User Avatar" src="@imagen" id="userImage" />
+            <div id="imagenP">
+                <!-- El input file se oculta hasta que se haga clic en Editar -->
+                <input type="file" class="form-control" id="image" asp-for="FileUpload" style="display: none;">
+            </div>
+        </div>
+        <div>
+            <h1 class="h4 mb-0 fw-bold">@nombre</h1>
+        </div>
+    </header>
+
+    <!-- Sección de Contacto -->
+    <section class="mb-4">
+        <div class="d-flex justify-content-between mb-3">
+            <h2 class="h5">Contact Details</h2>
+            <div id="buttons-sections">
+                <button id="btnEdit" class="btn btn-outline-secondary d-flex align-items-center">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Submit" class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" asp-for="Restaurant.Nombre" value="@nombre" disabled>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone" class="form-label">Teléfono</label>
+                        <input type="number" class="form-control" id="phone" asp-for="Restaurant.NumeroTelefono" value="@telefono" disabled>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" asp-for="Restaurant.Correo" value="@email" disabled>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="image" class="form-label">Imagen</label>
+                        <input type="file" class="form-control" id="fileImage" asp-for="FileUpload" disabled>
+                    </div>
+                    <div id="buttons-section" class="flex"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2>Redes Sociales</h2>
+
+
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Agregar Red social
+        </button>
+
+
+        <div class="mt-4">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th class="table-icon">Red Social</th>
+                        <th class="table-icon"></th>
+                    </tr>
+                </thead>
+                <tbody id="redes">
+                    <tr>
+                        <td class="table-icon">
+                            <a href="https://www.facebook.com" target="_blank" class="text-dark social-icon">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                        </td>
+                        <td class="table-icon">
+                            <a href="https://www.facebook.com" target="_blank" class="text-dark social-icon">
+
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-icon">
+                            <a href="https://twitter.com" target="_blank" class="text-dark social-icon">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-icon">
+                            <a href="https://www.linkedin.com" target="_blank" class="text-dark social-icon">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-icon">
+                            <a href="https://github.com" target="_blank" class="text-dark social-icon">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Campos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Container for dynamically added fields -->
+                <div id="fields-container">
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" placeholder="Texto">
+                        </div>
+                        <div class="col-md-5">
+                            <select class="form-select">
+
+                                <option value="">Seleccionar</option>
+                                <option value="Github">Github</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="Twitter">Twitter</option>
+
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger remove-field">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="add-field">Agregar</button>
+                <button type="button" class="btn btn-success" id="add-data">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+           
+
+            $('#add-field').click(function () {
+                // Clona la fila de campos y la añade al contenedor
+                var newField = `<div class="row mb-3 align-items-center">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" placeholder="Texto">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <select class="form-select">
+                                            <option value="">Seleccionar</option>
+                                            <option value="Github">Github</option>
+                                            <option value="Facebook">Facebook</option>
+                                            <option value="Instagram">Instagram</option>
+                                            <option value="Twitter">Twitter</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger remove-field">
+                                                   <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>`;
+                $('#fields-container').append(newField);
+            });
+
+            $(document).on('click', '.remove-field', function () {
+                $(this).closest('.row').remove();
+            });
+
+            // Al hacer clic en Editar, habilita los campos de texto y muestra los botones Guardar/Cancelar
+            $('#btnEdit').on('click', function (e) {
+                e.preventDefault();
+
+                // Habilitar los campos de texto
+                $('#nombre').prop('disabled', false);
+                $('#phone').prop('disabled', false);
+                $('#email').prop('disabled', false);
+                $('#fileImage').prop('disabled', false);
+                $('#image').show(); // Mostrar el input file
+
+                // Cambiar el botón de Editar por Guardar y Cancelar
+                $('#buttons-section').html(`
+                            <button id="btnSave" class="btn btn-outline-success d-flex align-items-center me-2">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                            <button id="btnCancel" class="btn btn-outline-danger d-flex align-items-center">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                        `);
+
+                // Acción al hacer clic en Cancelar
+                $('#btnCancel').on('click', function () {
+                    // Deshabilitar los campos de texto y restaurar los valores originales
+                    $('#nombre').prop('disabled', true).val('@nombre');
+                    $('#phone').prop('disabled', true).val('@telefono');
+                    $('#email').prop('disabled', true).val('@email');
+                    $('#fileImage').prop('disabled', true).val(''); // Limpiar el valor del input file
+
+                    // Restaurar el botón de Editar y ocultar el input de archivo
+                    $('#buttons-section').html(`
+                                <button id="btnEdit" class="btn btn-outline-secondary d-flex align-items-center">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                            `);
+                    $('#image').hide(); // Ocultar el input file
+                });
+
+                // Acción al hacer clic en Guardar
+                $('#btnSave').on('click', function () {
+                    // Aquí puedes agregar la lógica para guardar los cambios
+                });
+            });
+
+
+            $('#add-data').on('click', function () {
+                // Aquí puedes agregar la lógica para guardar los cambios
+                $.ajax({
+                    url: '@Url.Action("Create", "Redes")',
+                    type: 'POST',
+                    data: { socialEntities: obtenerNombresYLinks() },
+                    dataType: 'json',
+                    success: function (data) {
+                                alert("Agregados con exitos")
+                    },
+                    error: function (error) {
+                        $('#loading').hide();
+                        alert("Error al cargar las Redes");
+                        console.log("Error:", error);
+                    }
+                });
+               
+            });
+
+
+            function obtenerNombresYLinks() {
+                let nombresYLinks = [];
+
+                // Itera sobre cada fila dentro del contenedor de campos
+                $('#fields-container .row').each(function () {
+                    let nombre = $(this).find('select').val(); // Obtiene el valor del select
+                    let link = $(this).find('input[type="text"]').val(); // Obtiene el valor del input de texto (el enlace)
+
+                    // Solo agrega al array si ambos campos tienen valores
+                    if (nombre && link) {
+                        nombresYLinks.push({
+                            nombre: nombre,
+                            link: link ,
+                            RestaurantId: `@Guid.Parse(HttpContext.Session.GetString("Id"))`
+                        });
+                    }
+                });
+
+                console.log(nombresYLinks);
+                return nombresYLinks;
+            }
+
+            const TraerRedes = () => {
+                $.ajax({
+                    url: '@Url.Action("GetRedes", "Redes")',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        const list = $("#redes");
+                        list.empty();
+
+                        console.log(data.$values);
+
+                        data.$values.forEach(item => {
+                            // Crear y agregar la fila de la red social
+                            const red = `
+                        <tr>
+                            <td class="table-icon">
+                                <a href="${item.link}" target="_blank" class="text-dark text-2xl">
+                                    <i class="fa-brands fa-${item.nombre.toLowerCase()}"></i>
+                                </a>
+                            </td>
+                                      <td class="table-icon">
+                                        <button class="btn btn-danger">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                              <button class="btn btn-success">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                    </td>
+                        </tr>
+                        `;
+
+                            list.append(red);
+                        });
+                    },
+                    error: function (error) {
+                        $('#loading').hide();
+                        alert("Error al cargar las redes sociales");
+                        console.log("Error:", error);
+                    }
+                });
+            };
+
+            TraerRedes();
+
+        });
+    </script>
+}

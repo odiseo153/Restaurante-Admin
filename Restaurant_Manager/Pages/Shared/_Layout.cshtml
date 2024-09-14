@@ -1,0 +1,206 @@
+﻿@{
+    string imagen = Context.Session.GetString("Imagen") ?? "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Restaurant Manager</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4287/4287725.png" asp-append-version="true" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    @if (Context.Session.GetString("Nombre") != null)
+    {
+        <style>
+            body {
+                display: flex;
+                min-height: 100vh;
+                margin: 0;
+            }
+
+            /* Sidebar styles */
+            .sidebar-nav {
+                width: 250px;
+                background-color: #343a40;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow-y: auto;
+                position: fixed;
+                z-index: 1000;
+                transition: all 0.3s;
+            }
+
+
+
+            /* Main content styles */
+            .main-content {
+                flex-grow: 1;
+                margin-left: 250px;
+                padding: 20px;
+                transition: margin-left 0.3s ease;
+            }
+
+            .navbar-collapse {
+                display: flex;
+                justify-content: end;
+            }
+
+            .btn-toggle-sidebar {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1100;
+            }
+        </style>
+    }
+</head>
+<body>
+
+
+      <!-- Sidebar Section -->
+    @if (Context.Session.GetString("Nombre") != null)
+    {
+    <button class="btn btn-dark btn-toggle-sidebar d-lg-none">
+        <i class="fas fa-bars"></i>
+    </button>
+
+
+        <nav class="sidebar-nav bg-dark" id="sidebar" style="height: 100vh; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);">
+            <ul id="sidebarnav" class="text-white mt-3 p-4">
+                <!-- Logo Section -->
+                <div class="text-center mb-5">
+                    <img src="~/images/logo.jpg" class="w-50 rounded-circle" alt="Logo" style="border: 2px solid white;">
+                </div>
+
+                <!-- Dashboard -->
+                <li class="sidebar-item mb-4">
+                    <a class="sidebar-link d-flex align-items-center" href="/" aria-expanded="false"
+                       style="transition: all 0.3s ease-in-out;">
+                        <i class="text-white fa-solid fa-chart-line fa-2x me-3"></i>
+                        <span class="hide-menu text-white fs-4">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Platos -->
+                <li class="sidebar-item mb-4">
+                    <a class="sidebar-link d-flex align-items-center" asp-page="/Platos/Index" aria-expanded="false"
+                       style="transition: all 0.3s ease-in-out;">
+                        <i class="text-white fa-solid fa-utensils fa-2x me-3"></i>
+                        <span class="hide-menu text-white fs-4">Platos</span>
+                    </a>
+                </li>
+
+
+                     <li class="sidebar-item mb-4">
+                    <a class="sidebar-link d-flex align-items-center" asp-page="/Pedido/Index" aria-expanded="false"
+                       style="transition: all 0.3s ease-in-out;">
+                        <i class="text-white fa-solid fa-cart-shopping fa-2x me-3"></i>
+                        <span class="hide-menu text-white fs-4">Pedido</span>
+                    </a>
+                </li>
+
+                <!-- Clientes -->
+                <li class="sidebar-item mb-4">
+                    <a class="sidebar-link d-flex align-items-center" asp-page="/Clientes/Index" aria-expanded="false"
+                       style="transition: all 0.3s ease-in-out;">
+                        <i class="text-white fa-solid fa-users fa-2x me-3"></i>
+                        <span class="hide-menu text-white fs-4">Clientes</span>
+                    </a>
+                </li>
+
+                <!-- Tipos de Platos -->
+                <li class="sidebar-item mb-4">
+                    <a class="sidebar-link d-flex align-items-center" asp-page="/TipoPlatos/Index" aria-expanded="false"
+                       style="transition: all 0.3s ease-in-out;">
+                        <i class="text-white fa-solid fa-utensils fa-2x me-3"></i>
+                        <span class="hide-menu text-white fs-4">Tipos de Platos</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+
+
+    }
+
+    <div class="main-content">
+        @if (Context.Session.GetString("Nombre") != null)
+        {
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark rounded-3">
+                <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+                        <div class="text-light mb-3 font-weight-bold">@ViewData["Ruta"]</div>
+
+
+                    <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                        <div class="text-white">@Context.Session.GetString("Nombre")</div>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="@imagen" alt="Imagen" width="35" height="35" class="rounded-circle">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                                <div class="message-body">
+                                    <a asp-page="/Perfil/Index" class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-user fs-6"></i>
+                                        <p class="mb-0 fs-3">My Profile</p>
+                                    </a>
+                                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-mail fs-6"></i>
+                                        <p class="mb-0 fs-3">My Account</p>
+                                    </a>
+                                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-list-check fs-6"></i>
+                                        <p class="mb-0 fs-3">My Task</p>
+                                    </a>
+                                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        }
+
+        <main role="main" class=" mt-2">
+            @RenderBody()
+        </main>
+
+     
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // Selecciona el botón que activa el menú
+            $("#btn-toggle-sidebar").click(function (e) {
+                e.preventDefault();
+                // Agrega o quita la clase 'active' al hacer clic en el botón
+                $(".sidebar-nav").attr("hide",true);
+            });
+        });
+
+        // Si deseas que el menú se cierre automáticamente cuando se selecciona una opción
+        $(".sidebar-item a").click(function () {
+            if ($(window).width() <= 768) {
+                $(".sidebar-nav").removeAttr("hide");
+            }
+        });
+
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

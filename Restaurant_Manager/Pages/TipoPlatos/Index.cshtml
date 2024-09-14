@@ -1,0 +1,258 @@
+﻿@page
+@model Restaurant_Manager.Pages.TipoPlatos.IndexModel
+@{
+}
+
+<div class="d-flex flex-column vh-100">
+
+    <div class="space-y-2 p-4">
+        <!-- Success Alert -->
+        @if (ViewData["Success"] != null)
+        {
+            <div role="alert"
+                 class="alert alert-success d-flex align-items-center border-3 border-start border-success rounded-lg transition duration-300 ease-in-out hover:bg-success">
+                <i class="fas fa-check-circle me-2 text-success"></i>
+                <p class="mb-0 text-xs fw-semibold">@ViewData["Success"]</p>
+            </div>
+
+        }
+
+        @if (ViewData["Error"] != null)
+        {
+            <div role="alert"
+                 class="alert alert-danger d-flex align-items-center border-3 border-start border-danger rounded-lg transition duration-300 ease-in-out hover:bg-danger">
+                <i class="fas fa-times-circle me-2 text-danger"></i>
+                <p class="mb-0 text-xs fw-semibold">Error - @ViewData["Error"]</p>
+            </div>
+
+        }
+        <!-- Error Alert -->
+
+    </div>
+
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="input-group w-100 max-w-md">
+                <input class="buscador form-control" placeholder="Buscar Tipo de comida..." type="search" value="" />
+                <button class="btnBuscar btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+            <button data-bs-toggle="modal" data-bs-target="#createTipoModal" class="btn btn-success ms-3">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+        <div class="card border shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Tipo</th>
+                                <th scope="col"><span class="sr-only">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="tipos">
+
+                        </tbody>
+
+
+                    </table>
+                            <div id="loading" class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="createTipoModal" tabindex="-1" aria-labelledby="createClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="createDishModalLabel">Nuevo Tipo</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Submit">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="name" asp-for="tipo.Nombre" placeholder="Enter dish name">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus"></i> Crear Tipo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            setTimeout(() => {
+                $('.alert').hide();
+            }, 2000);
+
+            $('.btnBuscar').on('click', function () {
+                const query = $('.buscador').val();
+                TraerTipos(query);
+            });
+
+            $('form').on('submit', function (e) {
+                let isValid = true;
+
+                // Validar el campo 'Nombre del Tipo'
+                if ($('#name').val().trim() === '') {
+                    isValid = false;
+                    toastr.error('El nombre del tipo de plato es obligatorio.', 'Error de Validación');
+                }
+
+                // Si no es válido, evitar que se envíe el formulario
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Delegación de eventos para los botones de editar
+            $('.tipos').on('click', '.edit-btn', function () {
+                var $row = $(this).closest('tr');
+                var $razonText = $row.find('.razon-text');
+                var $editInput = $row.find('.edit-input');
+                var $editBtn = $(this);
+
+                toggleEditState($razonText, $editInput, $editBtn);
+
+                // Si el botón es de guardar, actualizar el tipo de plato
+                if ($editInput.hasClass('d-none') === false) {
+                    // Al hacer clic en "Guardar", enviar la actualización
+                    ActualizarTipoPlato($row, $editInput.val());
+                }
+            });
+
+            // Delegación para el botón de eliminar
+            $('.tipos').on('click', '.delete-btn', function () {
+                const id = $(this).closest('tr').attr('id').replace('row', '');
+                EliminarTipoPlato(id);
+            });
+
+            TraerTipos(); // Cargar los tipos al iniciar
+        });
+
+        // Función para alternar entre el estado de edición y guardado
+        const toggleEditState = ($razonText, $editInput, $editBtn) => {
+            if ($editInput.hasClass('d-none')) {
+                $razonText.addClass('d-none');
+                $editInput.removeClass('d-none');
+                $editBtn.html('<i class="fa-solid fa-save"></i>').removeClass('btn-success').addClass('btn-primary');
+            } else {
+                $razonText.text($editInput.val());
+                $razonText.removeClass('d-none');
+                $editInput.addClass('d-none');
+                $editBtn.html('<i class="fa-solid fa-pen-to-square"></i>').removeClass('btn-primary').addClass('btn-success');
+            }
+        };
+
+        // Función para traer los tipos desde el backend
+        const TraerTipos = (query = null) => {
+            $('#loading').show();
+            $.ajax({
+                url: '@Url.Action("GetTipos", "Tipos")',
+                type: 'GET',
+                data: { query: query },
+                dataType: 'json',
+                success: function (data) {
+                    var $list = $(".tipos");
+                    $list.empty();
+                    $('#loading').hide();
+
+                    if (!data || !data.$values || data.$values.length === 0) {
+                        $('#no-data').show();
+                    } else {
+                        $('#no-data').hide();
+                        renderTipos(data.$values);
+                    }
+                },
+                error: function (error) {
+                    $('#loading').hide();
+                    alert("Error al cargar tipos");
+                    console.log(error);
+                }
+            });
+        };
+
+        // Función para renderizar la tabla de tipos
+        const renderTipos = (tipos) => {
+            var $list = $(".tipos");
+            $.each(tipos, function (index, tipo) {
+                var newRow = `
+                    <tr id="row${tipo.id}">
+                        <td>
+                            <span class="razon-text">${tipo.nombre}</span>
+                            <input type="text" class="form-control d-none edit-input" value="${tipo.nombre}">
+                        </td>
+                        <td>
+                            <button class="btn btn-success edit-btn">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-danger delete-btn">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                $list.append(newRow);
+            });
+        };
+
+        // Función para actualizar el tipo de plato
+        const ActualizarTipoPlato = (row, nombre) => {
+            const id = row.attr('id').replace('row', ''); // Obtener el ID desde el atributo de la fila
+
+            const formData = new FormData();
+
+            formData.append('Id', id);  // Si tienes un campo de ID
+            formData.append('Nombre', nombre);
+
+            $.ajax({
+                url: '@Url.Action("Update", "Tipos")',
+                type: 'POST',
+                data: JSON.stringify({ Id: id, Nombre: nombre }),  // Serializar los datos
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (data) {
+                    toastr.success('Tipo de plato actualizado correctamente.', 'Éxito');
+                    TraerTipos();  // Recargar los tipos
+                },
+                error: function (error) {
+                    alert("Error al actualizar el tipo de plato");
+                    console.log(error);
+                }
+            });
+        };
+
+        // Función para eliminar el tipo de plato
+        const EliminarTipoPlato = (id) => {
+            $.ajax({
+                url: '@Url.Action("Delete", "Tipos")',
+                type: 'GET',
+                data: { Id: id },  // Enviar el ID del tipo a eliminar
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (data) {
+                    TraerTipos();  // Recargar los tipos
+                },
+                error: function (error) {
+                    alert("Error al eliminar el tipo de plato");
+                    console.log(error);
+                }
+            });
+        };
+
+
+    </script>
+}

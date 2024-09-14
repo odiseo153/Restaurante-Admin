@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "FJVaho76qUs5qYQESOE5bj3alCIPgJFyW60hnS6aqdb8ChAObIM4EdwFnCJY9GrrJRjGETd5MrItoK3qJOkQGg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Odiseo\\Desktop\\Todo\\Full Stack Proyects\\Restaurant Manager\\Core\\Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Odiseo\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.2\\microsoft.windowsdesktop.app.ref.8.0.2.nupkg.sha512",
+    "C:\\Users\\Odiseo\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.2\\microsoft.netcore.app.ref.8.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}

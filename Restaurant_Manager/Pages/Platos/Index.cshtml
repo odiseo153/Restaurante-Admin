@@ -1,0 +1,480 @@
+﻿@page
+@model Restaurant_Manager.Pages.Platos.IndexModel
+@{
+    ViewData["Ruta"] = "";
+    ViewData["title"] = "Platos";
+}
+
+
+<div class="d-flex flex-column h-100">
+
+
+    <div class="space-y-2 p-4">
+        <!-- Success Alert -->
+        @if (ViewData["Success"] != null)
+        {
+            <div role="alert" id="alerta"
+                 class="alert alert-success d-flex align-items-center justify-content-between border-3 border-start border-success rounded-lg transition duration-300 ease-in-out hover:bg-success">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                    <p class="mb-0 text-xs fw-semibold">@ViewData["Success"]</p>
+                </div>
+                <button id="alert" class="btn-close ms-3" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (ViewData["Error"] != null)
+        {
+            <div role="alert" id="alerta"
+                 class="alert alert-danger d-flex align-items-center justify-content-between border-3 border-start border-danger rounded-lg transition duration-300 ease-in-out hover:bg-danger">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-times-circle me-2 text-danger"></i>
+                    <p class="mb-0 text-xs fw-semibold">Error - @ViewData["Error"]</p>
+                </div>
+                <button id="alert" class="btn-close ms-3" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <!-- Error Alert -->
+
+
+    </div>
+
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+
+        <!-- Input de búsqueda -->
+        <div class="input-group w-100 max-w-md">
+            <input class="form-control buscador" type="search" placeholder="Buscar Platos..." />
+            <button class="btn btn-primary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+
+        <!-- Selector de categorías -->
+        <div class="input-group w-100 max-w-md ms-3">
+            <select class="form-select" id="categorias">
+                <option value="" disabled selected>Seleccionar Categoría</option>
+                <!-- Agregar más opciones según sea necesario -->
+            </select>
+        </div>
+
+        <!-- Botón para abrir modal de creación de platos -->
+        <button id="btnModal" class="btn btn-success ms-3" data-bs-toggle="modal" data-bs-target="#createDishModal">
+            <i class="fas fa-plus"></i> 
+        </button>
+
+    </div>
+
+    <hr />
+    <main class="platos flex-fill p-4 row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+
+        <div id="loading" class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+
+
+        <div id="no-data" class="alert alert-warning" role="alert">
+            <i class="fa-solid fa-circle-exclamation"></i> !  No hay Platos creados !
+        </div>
+
+
+    </main>
+</div>
+
+
+
+
+<div class="modal fade" id="createDishModal" tabindex="-1" aria-labelledby="createDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="modal-title" id="createDishModalLabel">Crear Plato</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Submit" class="p-4 border rounded shadow-sm bg-light">
+                    <!-- Imagen Vista Previa -->
+                    <div class="mb-4 text-center">
+                        <img class="img-fluid rounded shadow-sm" style="max-width: 250px;" src="" id="image-preview" alt="Vista previa de la imagen">
+                    </div>
+
+                    <!-- Nombre del Plato -->
+                    <div class="mb-4">
+                        <label for="name" class="form-label fw-bold">Nombre del Plato</label>
+                        <input type="text" class="form-control shadow-sm" id="name" asp-for="plato.Nombre" placeholder="Ensalada" required>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-bold">Descripción</label>
+                        <textarea class="form-control shadow-sm" id="description" rows="3" asp-for="plato.Descripcion" placeholder="Una ensalada muy buena" required></textarea>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="mb-4">
+                        <label for="price" class="form-label fw-bold">Precio</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="price" asp-for="plato.Precio" placeholder="100" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="mb-4">
+                        <label for="categorias" class="form-label fw-bold">Categoría</label>
+                        <select class="form-select shadow-sm" id="categoria" asp-for="plato.TipoId" required>
+                            <option value="" disabled selected>Seleccionar Categoría</option>
+                            <!-- Opciones dinámicas aquí -->
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="categorias" class="form-label fw-bold">Estado</label>
+                        <select class="form-select shadow-sm" id="estado" asp-for="plato.Estado" required>
+                            <option value="" disabled selected>Seleccionar Estado</option>
+                            <option value="0"  >Disponible</option>
+                            <option value="1"  >No Disponible</option>
+
+                            <!-- Opciones dinámicas aquí -->
+                        </select>
+                    </div>
+
+                    <!-- Subir Imagen -->
+                    <div class="mb-4">
+                        <label for="image" class="form-label fw-bold">Subir Imagen</label>
+                        <div class="input-group shadow-sm">
+                            <label class="input-group-text" for="image">
+                                <i class="fas fa-upload"></i>
+                            </label>
+                            <input type="file" asp-for="FileUpload" class="form-control" id="image" accept="image/*">
+                        </div>
+                        <small class="form-text text-muted">Formatos permitidos: JPG, PNG hasta 10MB.</small>
+                    </div>
+
+                    <!-- URL de Imagen -->
+                    <div class="mb-4">
+                        <label for="image-url" class="form-label fw-bold">URL de la Imagen (en caso de que no tengas una imagen para subir)</label>
+                        <input type="text" asp-for="ImagenRemplazo" class="form-control shadow-sm" id="image-url" placeholder="https://example.com/image.jpg">
+                        <small class="form-text text-muted">Opcional: Puedes ingresar una URL si no tienes una imagen local.</small>
+                    </div>
+
+                    <!-- Botón Crear Plato -->
+                    <div class="text-center">
+                        <button id="createButton" type="submit" class="btn btn-primary shadow-sm w-100">
+                            <i class="fas fa-plus"></i> Crear Plato
+                        </button>
+                    </div>
+                </form>
+
+                    <button id="editButton" hidden class="btn btn-primary w-100">
+                        <i class="fas fa-save"></i> Editar Plato
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+   <script>
+
+        $(document).ready(function () {
+
+            setTimeout(() => {
+                $('#alert').attr('hidden',true)
+            }, 2000);
+
+
+            $('#image').on('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#image-preview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Cuando se introduce una URL de imagen
+            $('#image-url').on('input', function () {
+                const imageUrl = $(this).val();
+                if (imageUrl) {
+                    $('#image-preview').attr('src', imageUrl);
+                }
+            });
+
+
+            $('.btnBuscar').on('click', function (e) {
+                const query = $('.buscador').val();
+                TraerPlatos(query);
+            });
+
+            $('#alert').on('click', function (e) {
+                $('#alerta').attr('hidden', true);
+            });
+
+            $('#btnModal').on('click', function () {
+                limpiarFormulario();  // Limpiar todos los campos del formulario
+                $('#createDishModalLabel').text('Agregar Plato');  // Cambiar el título del modal a "Agregar Plato"
+                $('#createButton').show();  // Mostrar el botón de crear
+                $('#editButton').hide();  // Ocultar el botón de editar (si está visible)
+            });
+
+            $('#categorias').on('change', function () {
+                const tipo = $(this).val();
+                TraerPlatos(tipo);
+
+            });
+
+            $('#editButton').on('click', function (e) {
+                ActualizarPlatos();
+            });
+
+            $('form').on('submit', function (e) {
+                let isValid = true;
+
+                // Validar el campo 'Nombre del Plato'
+                if ($('#name').val().trim() === '') {
+                    isValid = false;
+                    toastr.error('El nombre del plato es obligatorio.', 'Error de Validación');
+                }
+
+                // Validar el campo 'Descripcion'
+                if ($('#description').val().trim() === '') {
+                    isValid = false;
+                    toastr.error('La descripción es obligatoria.', 'Error de Validación');
+                }
+
+                // Validar el campo 'Precio'
+                if ($('#price').val().trim() === '' || isNaN($('#price').val()) || $('#price').val() <= 0) {
+                    isValid = false;
+                    toastr.error('El precio debe ser un número válido y mayor que 0.', 'Error de Validación');
+                }
+
+                // Si no es válido, evitar que se envíe el formulario
+                if (!isValid) {
+                    e.preventDefault(); // Evitar envío del formulario
+                }
+
+            });
+
+           TraerPlatos();
+           TraerTipoPlatos();
+
+        });
+
+
+        const limpiarFormulario = () => {
+            $('#plato-id').val('');  // Limpiar el ID del plato
+            $('#name').val('');  // Limpiar el nombre del plato
+            $('#description').val('');  // Limpiar la descripción
+            $('#price').val('');  // Limpiar el precio
+            $('#image-preview').attr('src', '').hide();  // Limpiar la vista previa de la imagen y ocultarla
+            $('#image').val('');  // Limpiar el input de imagen
+            $('#image-url').val('');  // Limpiar el campo de URL de imagen (si existe)
+        };
+
+
+          const ActivarEdit = (plato) => {
+            console.log(plato);
+
+            // Asignar valores a los campos del modal de edición
+            $('#name').val(plato.nombre);
+            $('#plato-id').val(plato.id);
+            $('#createDishModalLabel').text("Editar Plato");
+            $('#description').val(plato.descripcion);
+            $('#price').val(plato.precio);
+            $('#image-preview').attr('src', plato.imagen); // Corregido para el campo de imagen
+
+            // Ocultar el botón de crear
+            $('#createButton').hide();
+            // Mostrar el botón de editar
+            $('#editButton').removeAttr('hidden').show();
+
+            // Mostrar el modal de edición
+            $('#createDishModal').modal('show');
+        };
+
+
+         const TraerTipoPlatos = () => {
+
+            $.ajax({
+                url: '@Url.Action("GetTipos", "Tipos")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var list = $("#categorias");
+                    var list1 = $("#categoria");
+                    list.empty();
+                    list1.empty();
+
+                    list.append('<option value="" disabled selected>Seleccionar Categoría</option>')
+                    list.append('<option value="" >Todos</option>')
+
+                    list1.append('<option value="" disabled selected>Seleccionar Categoría</option>')
+
+                        $.each(data.$values, function (index, item) {
+                            // Crear y agregar la tarjeta de plato
+                        var plato = ` <option value="${item.id}">
+                                         ${item.nombre}
+                                       </option>`
+
+                            list.append(plato);
+                            list1.append(plato);
+
+                        });
+                },
+                error: function (error) {
+                    $('#loading').hide();
+                    alert("Error al cargar los platos");
+                    console.log("Error:", error);
+                }
+            });
+        };
+
+
+        // Función para traer los platos desde el servidor
+        const TraerPlatos = (query = null) => {
+            $('#loading').show(); // Muestra el spinner de carga
+
+            $.ajax({
+                url: '@Url.Action("GetPlatos", "Platos")',
+                type: 'GET',
+                data: { query: query },
+                dataType: 'json',
+                success: function (data) {
+                    const list = $(".platos");
+                    list.empty(); // Limpia la lista de platos
+                    $('#loading').hide(); // Oculta el spinner de carga
+
+                    // Verificar si los datos son válidos y contienen platos
+                    if (!data || !data.$values || data.$values.length === 0) {
+                        console.log("No hay platos disponibles.");
+                        $('#no-data').show(); // Muestra el mensaje de "sin datos"
+                    } else {
+                        $('#no-data').hide(); // Oculta el mensaje de "sin datos"
+                        console.log(data);
+
+                        // Itera sobre los platos y genera las tarjetas correspondientes
+                        $.each(data.$values, function (index, item) {
+                            const disponibilidadClass = item.estado ? 'text-success' : 'text-danger'; // Establece la clase de color según el estado
+                            const disponibilidadTexto = item.estado ? 'Disponible' : 'No Disponible'; // Texto de disponibilidad
+
+                            // Añadir tarjeta al DOM
+                            list.append(`
+                                <div class="card shadow-sm mb-3" style="overflow:hidden;">
+                                    <img src="${item.imagen}" alt="${item.nombre}" class="card-img-top" style="aspect-ratio: 300 / 200; object-fit: cover;" />
+                                    <input type="hidden" id="plato-id" value="${item.id}" />
+                                    <div class="card-body">
+                                        <h2 class="card-title h5 font-weight-bold">${item.nombre}</h2>
+                                        <p class="card-text text-muted">${item.descripcion}</p>
+                                        <p class="card-text ${disponibilidadClass}">${disponibilidadTexto}</p>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <div class="font-weight-medium">$${item.precio.toFixed(2)}</div>
+                                            <div class="d-flex gap-2">
+                                                <!-- Botón de Editar -->
+                                                <button data-bs-toggle="modal" data-bs-target="#createDishModal"
+                                                    onclick='ActivarEdit(${JSON.stringify(item)})' class="btn btn-outline-secondary btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <!-- Botón de Eliminar -->
+                                                <button onclick="EliminarPlato('${item.id}')" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                    }
+                },
+                error: function (error) {
+                    $('#loading').hide(); // Oculta el spinner de carga en caso de error
+                    alert("Error al cargar los platos");
+                    console.error("Error:", error); // Muestra el error en la consola
+                }
+            });
+        };
+
+
+        const EliminarPlato = (id) => {
+            $('#loading').show();
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Platos")',  // URL de la acción del servidor
+                type: 'GET',
+                data: {Id:id},  // Enviar el FormData
+                dataType: 'json',  // Esperar respuesta JSON
+                success: function (data) {
+                    $('#loading').hide();
+                    TraerPlatos();
+                },
+                error: function (error) {
+                    $('#loading').hide();
+                    alert("Error al actualizar los platos");
+                    console.log("Error:", error);
+                }
+            });
+
+
+        };
+
+        const ActualizarPlatos = () => {
+            $('#loading').show();
+
+            // Crear el objeto FormData para enviar los datos
+            const formData = new FormData();
+
+            formData.append('Id', $('#plato-id').val());  // Si tienes un campo de ID
+            formData.append('Imagen', $('#image-preview').val());  // URL de la imagen
+            formData.append('Nombre', $('#name').val());
+            formData.append('Descripcion', $('#description').val());
+            formData.append('Precio', $('#price').val());
+            formData.append('TipoId', $('#categoria').val());
+            formData.append('Estado', $('#estado').val());
+
+            // Agregar archivo de imagen si está presente
+            const fileInput = $('#image')[0].files[0];
+            if (fileInput) {
+                formData.append('FileUpload', fileInput);  // Asegurarse de que el archivo se suba
+            }
+
+            $.ajax({
+                url: '@Url.Action("Update", "Platos")',  // URL de la acción del servidor
+                type: 'POST',
+                data: formData,  // Enviar el FormData
+                processData: false,  // Deshabilitar el procesamiento automático de datos
+                contentType: false,  // Deshabilitar la configuración automática del contentType
+                dataType: 'json',  // Esperar respuesta JSON
+                success: function (data) {
+                    $('#loading').hide();
+                    $('#createDishModal').modal('hide');
+                    // Recargar o actualizar la lista de platos
+                    TraerPlatos();
+                },
+                error: function (error) {
+                    $('#loading').hide();
+                    alert("Error al actualizar los platos");
+                    console.log("Error:", error);
+                }
+            });
+        };
+
+
+
+
+
+   </script>
+}

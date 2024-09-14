@@ -1,0 +1,288 @@
+﻿@page
+@model Restaurant_Manager.Pages.Ventas.IndexModel
+@{ }
+
+
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row gap-4 p-3">
+        <!-- User Profile Section -->
+        <div class="flex-fill bg-light rounded p-4 shadow-sm">
+            <div class="d-flex align-items-start gap-2">
+                <div>
+                    <h5 class="text-dark profile-link">Sophia Page</h5>
+                    <p class="text-muted small">Email: sophia.page@example.com</p>
+                </div>
+                <button class="btn btn-danger eliminar-cliente">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="flex-fill bg-light rounded p-4 shadow-sm">
+            <h3 class="fw-medium">Summary</h3>
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <p class="text-muted small mb-1" id="totalDishes">Total Dishes:</p>
+                    <h5 class="fw-semibold" id="totalDishesValue">0</h5>
+                </div>
+                <div class="d-flex align-items-center gap-2 small fw-medium">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span id="precio">0.00</span>
+                </div>
+            </div>
+            <button class="btn btn-primary w-100">Buy</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="flex-fill">
+    <button class="btn btn-primary" id="openModal">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+</div>
+
+<div class="container mt-6">
+    <div id="platos">
+        <!-- Aquí se agregarán los platos -->
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="platoModal" tabindex="-1" aria-labelledby="platoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="platoModalLabel">Agregar Platos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input class="form-control" id="modalBuscador" placeholder="Search for dishes..." autocomplete="off" />
+                </div>
+                <div id="modalDishList" class="grid gap-3">
+                    <!-- Los platos se inyectarán aquí -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="clienteModal" tabindex="-1" aria-labelledby="ClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="platoModalLabel">Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input class="form-control" id="modalBuscador" placeholder="Search for dishes..." autocomplete="off" />
+                </div>
+                <div id="modalClienteList" class="grid gap-3">
+                    <!-- Los platos se inyectarán aquí -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let totalPrice = 0;
+            let totalDishes = 0;
+
+            // Abrir el modal
+            $('#openModal').on('click', function () {
+                $('#platoModal').modal('show');
+                traerPlatos();  // Cargar los platos al abrir el modal
+            });
+
+            // Buscar platos en el modal
+            $('#modalBuscador').on('input', function () {
+                const query = $(this).val();
+                traerPlatos(query);  // Filtrar platos mientras se escribe
+            });
+
+            // Traer platos desde el backend
+            const traerClientes = (query = null) => {
+                $.ajax({
+                    url: '@Url.Action("GetPlatos", "Platos")',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { query: query },
+                    success: function (data) {
+                        let dishesHtml = '';
+
+                        $.each(data.$values, function (index, item) {
+                            dishesHtml += `
+                                                <div class="card border shadow-sm p-3 mb-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div>
+                                                            <h3 class="fw-medium">${item.nombre}</h3>
+                                                        </div>
+                                                        <button class="btn btn-primary ms-auto agregar-cliente" data-id="${item.id}" data-name="${item.nombre}" >
+                                                            Agregar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            `;
+                        });
+
+                        $('#modalClienteList').html(dishesHtml);
+                    },
+                    error: function (error) {
+                        console.log("Error:", error);
+                    }
+                });
+            };
+
+
+            const  traerPlatos = (query = null) => {
+                $.ajax({
+                    url: '@Url.Action("GetPlatos", "Platos")',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { query: query },
+                    success: function (data) {
+                        let dishesHtml = '';
+
+                        $.each(data.$values, function (index, item) {
+                            dishesHtml += `
+                                                        <div class="card border shadow-sm p-3 mb-3">
+                                                            <div class="d-flex align-items-center gap-3">
+                                                                <img src="${item.imagen}" alt="${item.nombre}" width="80" height="80" class="rounded object-cover" />
+                                                                <div>
+                                                                    <h3 class="fw-medium">${item.nombre}</h3>
+                                                                    <p class="text-muted small">$${item.precio.toFixed(2)}</p>
+                                                                </div>
+                                                                <button class="btn btn-primary ms-auto agregar-plato" data-id="${item.id}" data-imagen="${item.imagen}" data-name="${item.nombre}" data-price="${item.precio}">
+                                                                    Agregar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                        });
+
+                        $('#modalDishList').html(dishesHtml);
+                    },
+                    error: function (error) {
+                        console.log("Error:", error);
+                    }
+                });
+            };
+
+
+            const CrearPedido = () => {
+                const formData = new FormData();
+
+                formData.append('ClienteId', '');
+                formData.append('MontoTotal', '');
+
+
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Pedido")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { query: query },
+                    success: function (data) {
+                      
+                        
+                    },
+                    error: function (error) {
+                        console.log("Error:", error);
+                    }
+                });
+            };
+
+
+            // Manejar la adición de platos
+            $(document).on('click', '.agregar-plato', function () {
+                const Id = $(this).data('id');
+                const Name = $(this).data('name');
+                const Price = parseFloat($(this).data('price')); // Convertir a número
+                const Imagen = $(this).data('imagen');
+
+                // Añadir plato al contenedor
+                $('#platos').append(`
+                            <div class="card border shadow-sm p-3 mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="${Imagen}" alt="${Name}" width="80" height="80" class="rounded object-cover" />
+                                    <div>
+                                        <h3 class="fw-medium">${Name}</h3>
+                                        <p class="text-muted small">$${Price.toFixed(2)}</p>
+                                    </div>
+                                    <button class="btn btn-danger ms-auto eliminar-plato" data-price="${Price}">
+                                        <i class="text-red fa-solid fa-circle-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+
+                // Actualizar el total de platos y precios
+                totalDishes++;
+                totalPrice += Price;
+
+                $('#totalDishes').text(`${totalDishes} dishes`);
+                $('#precio').text(totalPrice.toFixed(2));
+
+                // Cerrar el modal
+                $('#platoModal').modal('hide');
+            });
+
+
+            $(document).on('click', '.agregar-cliente', function () {
+                const Name = $(this).data('name');
+                const Imagen = $(this).data('imagen');
+
+                // Añadir plato al contenedor
+                $('#cliente').html(`
+                                    <div class="card border shadow-sm p-3 mb-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div>
+                                                <h3 class="fw-medium">${Name}</h3>
+                                            </div>
+                                            <button class="btn btn-danger ms-auto eliminar-plato">
+                                                <i class="text-red fa-solid fa-circle-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `);
+
+                $('#clienteModal').modal('hide');
+            });
+
+
+            // Eliminar plato
+            $(document).on('click', '.eliminar-cliente', function () {
+                const price = parseFloat($(this).data('price'));
+                $(this).closest('.card').remove();
+
+                // Actualizar el total de platos y precios
+                totalDishes--;
+                totalPrice -= price;
+
+                $('#totalDishes').text(`${totalDishes} dishes`);
+                $('#precio').text(totalPrice.toFixed(2));
+            });
+
+
+        });
+    </script>
+}

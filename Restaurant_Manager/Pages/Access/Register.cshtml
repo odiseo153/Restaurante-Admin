@@ -1,0 +1,71 @@
+﻿@page
+@model Restaurant_Manager.Pages.Access.RegisterModel
+@{
+}
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+     data-sidebar-position="fixed" data-header-position="fixed">
+    <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <div class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="https://th.bing.com/th/id/R.0322bfd36d6b9b8f76bd4b3f6e50db82?rik=I7e%2bpVQ3jgEg6w&pid=ImgRaw&r=0" width="180" alt="">
+                            </div>
+                            <p class="text-center">Your Social Campaigns</p>
+                            <form method="post" enctype="multipart/form-data" asp-page-handler="Submit">
+                                <div class="mb-3">
+                                    <label for="exampleInputtext1" class="form-label">
+                                        <i class="fas fa-store"></i> Nombre de Restaurante
+                                    </label>
+                                    <input type="text" class="form-control" required value="Pollo voctorina" id="exampleInputtext1" aria-describedby="textHelp" asp-for="Restaurant.Nombre">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="exampleInputtext1" class="form-label">
+                                        <i class="fas fa-phone"></i> Teléfono (Opcional)
+                                    </label>
+                                    <input type="text" class="form-control" id="exampleInputtext1" value="8297890766" aria-describedby="textHelp" asp-for="Restaurant.NumeroTelefono">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="exampleInputEmail1" class="form-label">
+                                        <i class="fas fa-envelope"></i> Correo
+                                    </label>
+                                    <input type="email" class="form-control" required id="exampleInputEmail1" value="pollo@gmail.com" aria-describedby="emailHelp" asp-for="Restaurant.Correo">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">
+                                        <i class="fas fa-lock"></i> Contraseña
+                                    </label>
+                                    <input type="password" class="form-control" required id="exampleInputPassword1" value="12345" asp-for="Restaurant.clave">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">
+                                        <i class="fas fa-image"></i> Imagen (Opcional)
+                                    </label>
+                                    <input type="file" class="form-control" id="exampleInputPassword1" asp-for="FileUpload">
+                                </div>
+
+                                <button class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">
+                                    <i class="fas fa-user-plus"></i> Sign Up
+                                </button>
+
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <p class="fs-4 mb-0 fw-bold">Already have an Account?</p>
+                                    <a class="text-primary fw-bold ms-2" asp-page="/Access/Index">
+                                        <i class="fas fa-sign-in-alt"></i> Sign In
+                                    </a>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

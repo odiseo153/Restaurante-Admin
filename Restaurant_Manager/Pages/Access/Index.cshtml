@@ -1,0 +1,52 @@
+﻿@page
+@model Restaurant_Manager.Pages.Access.Index1Model
+@{
+}
+
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+     data-sidebar-position="fixed" data-header-position="fixed">
+    <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center w-100">
+        <div class="d-flex align-items-center justify-content-center w-100 h-100">
+            <div class="row justify-content-center w-100 h-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0 w-100">
+                        <div class="card-body">
+                            <div class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="https://th.bing.com/th/id/R.0322bfd36d6b9b8f76bd4b3f6e50db82?rik=I7e%2bpVQ3jgEg6w&pid=ImgRaw&r=0" width="180" alt="">
+                            </div>
+                            <p class="text-center">Tu administrador favorito</p>
+                            @if(HttpContext.Session.GetString("Error")!=null){
+                                
+                                <p class="text-center text-danger">@HttpContext.Session.GetString("Error")</p>
+                            }
+
+                            <form method="post"  asp-page-handler="Submit">
+                                <div class="mb-3">
+                                    <label for="exampleInputEmail1" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" id="exampleInputEmail1" value="pollo@gmail.com" asp-for="Email">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="exampleInputPassword1" value="12345" asp-for="Clave">
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" checked>
+                                        <label class="form-check-label text-dark" for="flexCheckChecked">
+                                            Remember this Device
+                                        </label>
+                                    </div>
+                                    <a class="text-primary fw-bold">Forgot Password?</a>
+                                </div>
+                                <button class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <a class="text-primary fw-bold ms-2" asp-page="/Access/Register">Create an account</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

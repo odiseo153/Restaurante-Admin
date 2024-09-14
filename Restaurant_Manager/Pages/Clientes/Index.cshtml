@@ -1,0 +1,221 @@
+﻿@page
+@model Restaurant_Manager.Pages.Clientes.IndexModel
+@{
+    ViewData["title"] = "Clientes";
+}
+
+
+<div class="d-flex flex-column vh-100">
+
+    <div class="space-y-2 p-4">
+
+        @if (ViewData["Success"] != null)
+        {
+            <div role="alert"
+                 class="alert alert-success d-flex align-items-center border-3 border-start border-success rounded-lg transition duration-300 ease-in-out hover:bg-success">
+                <i class="fas fa-check-circle me-2 text-success"></i>
+                <p class="mb-0 text-xs fw-semibold">@ViewData["Success"]</p>
+            </div>
+
+        }
+
+
+        @if (ViewData["Error"] != null)
+        {
+            <div role="alert"
+                 class="alert alert-danger d-flex align-items-center border-3 border-start border-danger rounded-lg transition duration-300 ease-in-out hover:bg-danger">
+                <i class="fas fa-times-circle me-2 text-danger"></i>
+                <p class="mb-0 text-xs fw-semibold">Error - @ViewData["Error"]</p>
+            </div>
+
+        }
+
+
+    </div>
+
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+           
+            <div class="input-group w-100 max-w-md">
+                <input class="buscador form-control" placeholder="Buscar Clientes..." type="search" value="" />
+                <button class="btnBuscar btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <button data-bs-toggle="modal" data-bs-target="#createClientModal" class="btnBuscar btn btn-success ms-3">
+                <i class="fas fa-plus"></i>
+            </button>
+        
+        </div>
+        <div class="card border shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Telefono</th>
+                                <th scope="col"><span class="sr-only">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="clientes">
+                           
+                            <div id="no-data" hidden class="alert alert-warning" role="alert">
+                                <i class="fa-solid fa-circle-exclamation"></i> ! No hay Clientes creados !
+                            </div>
+
+                        </tbody>
+                    </table>
+                        <div id="loading" class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+
+
+
+<div class="modal fade" id="createClientModal" tabindex="-1" aria-labelledby="createClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="createDishModalLabel">Nuevo Cliente</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Submit">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="name" asp-for="cliente.Nombre" placeholder="Enter dish name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Correo (Opcional)</label>
+                        <input type="email" class="form-control" id="email" rows="3" asp-for="cliente.Correo" placeholder="ejemplo@gmail.com" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">NumeroTelefono (Opcional)</label>
+                        <input type="number" class="form-control" id="telefono" asp-for="cliente.NumeroTelefono" placeholder="Ingresa el numero de telefono">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus"></i> Crear Cliente
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            setTimeout(() => {
+                $('.alert').hide()
+            }, 2000)
+
+            TraerClientes();
+
+        });
+
+        $('.btnBuscar').on('click', function (e) {
+            const query = $('.buscador').val();
+            TraerClientes(query);
+        });
+
+        $('form').on('submit', function (e) {
+            let isValid = true;
+
+            if ($('#name').val().trim() === '') {
+                isValid = false;
+                toastr.error('El nombre del plato es obligatorio.', 'Error de Validación');
+            }
+
+            if ($('#email').val().trim() === '') {
+                isValid = false;
+                toastr.error('El email es obligatorio.', 'Error de Validación');
+            }
+
+            if ($('#telefono').val().trim() === '' || isNaN($('#telefono').val()) || $('#telefono').val() <= 0) {
+                isValid = false;
+                toastr.error('El telefono debe tener 10 digitos.', 'Error de Validación');
+            }
+
+            // Si no es válido, evitar que se envíe el formulario
+            if (!isValid) {
+                e.preventDefault(); // Evitar envío del formulario
+            }
+
+        });
+
+
+
+        const TraerClientes = (query) => {
+            $('#loading').show();
+            $.ajax({
+                url: '@Url.Action("GetClientes", "Cliente")',
+                type: 'GET',
+                dataType: 'json',
+                data: { query: query },
+                success: function (data) {
+                    var list = $(".clientes");
+                    list.empty();
+                    $('#loading').hide();
+                    if (!data || !data.$values || data.$values.length === 0) {
+                        $('#no-data').show();
+                    } else {
+                        $('#no-data').hide();
+                        $.each(data.$values, function (index, item) {
+                            list.append(`
+                                    <tr>
+                                        <td>${item.nombre}</td>
+                                        <td>${item.correo}</td>
+                                        <td>${item.numeroTelefono}</td>
+                                        <td>
+                                            <button class="btn btn-light">
+                                                <div class="d-inline-block"></div>
+                                                <span class="sr-only"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                 `);
+                        });
+                    }
+                },
+                error: function (error) {
+                    $('#loading').hide();
+                    alert("Error al cargar proyectos");
+                    console.log(error)
+                }
+            });
+        }
+
+
+
+
+
+    </script>
+}
+
+
